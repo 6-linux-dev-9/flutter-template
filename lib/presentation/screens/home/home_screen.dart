@@ -121,7 +121,7 @@ class HomeScreen extends StatelessWidget {
                           color: color.tertiaryContainer,
                           fgColor: color.onTertiaryContainer,
                           onOpenList: () => context.pushNamed('productos'),
-                          onCreate: () => context.pushNamed('productosNew'),
+                          onCreate: () => context.pushNamed('productoNew'),
                         ),
                         _ModuleCard(
                           title: 'Reportes (próx.)',
@@ -140,6 +140,26 @@ class HomeScreen extends StatelessWidget {
                           onCreate: null,
                           disabled: true,
                         ),
+                        _ModuleCard(
+                          title: 'Herramientas',
+                          subtitle:
+                              'Revisa los input que posee el sistema.',
+                          icon: Icons.inventory_2,
+                          color: color.tertiaryContainer,
+                          fgColor: color.onTertiaryContainer,
+                          onOpenList: () => context.pushNamed('dev'),
+                          ///onCreate: () => context.pushNamed('productosNew'),
+                        ),
+                        //  _ModuleCard(
+                        //   title: 'Productos',
+                        //   subtitle:
+                        //       'Administra catálogo, precios y existencias.',
+                        //   icon: Icons.inventory_2,
+                        //   color: color.tertiaryContainer,
+                        //   fgColor: color.onTertiaryContainer,
+                        //   onOpenList: () => context.pushNamed('productos'),
+                        //   onCreate: () => context.pushNamed('productosNew'),
+                        // ),
                       ],
                     );
                   },

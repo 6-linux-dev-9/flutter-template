@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/core/di/service_locator.dart';
 import 'package:template_app/data/models/usuario/input/user_update_model.dart';
 // Si tu repo.update requiere un modelo tipado de entrada, importa aquí:

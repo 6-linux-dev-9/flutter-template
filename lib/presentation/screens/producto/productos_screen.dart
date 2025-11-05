@@ -1,28 +1,30 @@
-// lib/presentation/screens/usuario/usuarios_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:template_app/core/di/providers/user_provider.dart';
-import 'package:template_app/data/models/usuario/output/user_model.dart';
+import 'package:intl/intl.dart';
+import 'package:template_app/core/di/providers/product_provider.dart';
+import 'package:template_app/core/utils/date_format.dart';
 
-class UsuariosScreen extends ConsumerWidget {
-  const UsuariosScreen({super.key});
+import 'package:template_app/data/models/producto/output/producto_model.dart';
 
-  Future<void> _deleteUser(
+class ProductosScreen extends ConsumerWidget {
+  const ProductosScreen({super.key});
+
+  Future<void> _deleteProducto(
     BuildContext context,
     WidgetRef ref,
-    UsuarioModel u,
+    ProductoModel p,
   ) async {
-    final repo = ref.read(userRepositoryProvider);
+    final repo = ref.read(productRepositoryProvider);
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: const Text('Eliminar usuario'),
+            title: const Text('Eliminar producto'),
             content: Text(
-              '¿Seguro que deseas eliminar a "${u.nombre}"?\nEsta acción no se puede deshacer.',
+              '¿Seguro que deseas eliminar "${p.nombre}"?\nEsta acción no se puede deshacer.',
             ),
             actions: [
               TextButton(
@@ -41,11 +43,10 @@ class UsuariosScreen extends ConsumerWidget {
 
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await repo.delete(u.id.toString());
-      // refrescar lista
-      ref.invalidate(usuariosProvider);
+      await repo.delete(p.id.toString());
+      ref.invalidate(productosProvider);
       messenger.showSnackBar(
-        const SnackBar(content: Text('Usuario eliminado')),
+        const SnackBar(content: Text('Producto eliminado')),
       );
     } catch (e) {
       messenger.showSnackBar(
@@ -56,40 +57,39 @@ class UsuariosScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final usuarios = ref.watch(usuariosProvider);
+    final productos = ref.watch(productosProvider);
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Usuarios'),
-        centerTitle: Platform.isIOS, // sutil toque iOS
+        title: const Text('Productos'),
+        centerTitle: Platform.isIOS,
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/usuarios/new'),
+        onPressed: () => context.push('/productos/new'),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo'),
       ),
-      body: usuarios.when(
+      body: productos.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
             (e, _) => _ErrorState(
-              message: 'Error al cargar usuarios',
+              message: 'Error al cargar productos',
               details: e.toString(),
-              onRetry: () => ref.invalidate(usuariosProvider),
+              onRetry: () => ref.invalidate(productosProvider),
             ),
         data: (list) {
           if (list.isEmpty) {
-            return _EmptyState(onCreate: () => context.push('/usuarios/new'));
+            return _EmptyState(onCreate: () => context.push('/productos/new'));
           }
 
-          // Pull-to-refresh
           return RefreshIndicator(
-            onRefresh: () => ref.refresh(usuariosProvider.future),
+            onRefresh: () => ref.refresh(productosProvider.future),
             child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
               itemCount: list.length,
               itemBuilder: (context, i) {
-                final u = list[i] as UsuarioModel;
+                final p = list[i];
 
                 return Card(
                   elevation: 2,
@@ -102,21 +102,21 @@ class UsuariosScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Encabezado con icono y nombre
+                        // Header
                         Row(
                           children: [
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: cs.primaryContainer,
                               child: Icon(
-                                Icons.person,
+                                Icons.inventory_2_outlined,
                                 color: cs.onPrimaryContainer,
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                u.nombre,
+                                p.nombre,
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(fontWeight: FontWeight.w600),
                                 maxLines: 1,
@@ -127,10 +127,32 @@ class UsuariosScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 10),
 
-                        // Campos “Nombre: … / Email: …”
-                        _FieldLine(label: 'Nombre', value: u.nombre),
+                        // Campos
+                        // Campos
+                        _FieldLine(label: 'Nombre', value: p.nombre),
                         const SizedBox(height: 4),
-                        _FieldLine(label: 'Email', value: u.email),
+
+                        _FieldLine(label: 'Precio', value: '${p.precio} Bs'),
+                        const SizedBox(height: 4),
+
+                        _FieldLine(
+                          label: '¿Es caro?',
+                          value: p.esCaro ? 'Sí' : 'No',
+                        ),
+                        const SizedBox(height: 4),
+
+                        _FieldLine(
+                          label: 'Diagrama',
+                          value:
+                              p.diagrama.length > 45
+                                  ? p.diagrama.substring(0, 45) + '…'
+                                  : p.diagrama,
+                        ),
+                        _FieldLine(
+                          label: 'Fecha de Creación',
+                          value: p.fechaCreacion.toPretty(),
+                        ),
+
 
                         const SizedBox(height: 12),
                         Row(
@@ -139,33 +161,18 @@ class UsuariosScreen extends ConsumerWidget {
                               child: OutlinedButton.icon(
                                 onPressed:
                                     () =>
-                                        context.push('/usuarios/${u.id}/edit'),
+                                        context.push('/productos/${p.id}/edit'),
                                 icon: const Icon(Icons.edit_outlined),
                                 label: const Text('Editar'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: FilledButton.tonalIcon(
-                                onPressed: () => _deleteUser(context, ref, u),
+                                onPressed:
+                                    () => _deleteProducto(context, ref, p),
                                 icon: const Icon(Icons.delete_outline),
                                 label: const Text('Eliminar'),
-                                style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
                               ),
                             ),
                           ],
@@ -203,8 +210,6 @@ class _FieldLine extends StatelessWidget {
         ],
       ),
     );
-    // Si prefieres SelectableText:
-    // return SelectableText.rich(...)
   }
 }
 
@@ -221,15 +226,15 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.group_outlined, size: 64, color: cs.outline),
+            Icon(Icons.inventory_2_outlined, size: 64, color: cs.outline),
             const SizedBox(height: 12),
             Text(
-              'Sin usuarios aún',
+              'Sin productos aún',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
             Text(
-              'Crea tu primer usuario para empezar.',
+              'Agrega tu primer producto.',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
@@ -237,8 +242,8 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: onCreate,
-              icon: const Icon(Icons.person_add_alt_1),
-              label: const Text('Crear usuario'),
+              icon: const Icon(Icons.add),
+              label: const Text('Crear producto'),
             ),
           ],
         ),

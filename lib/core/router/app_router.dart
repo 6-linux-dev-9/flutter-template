@@ -33,6 +33,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:template_app/presentation/screens/dev/inputs.dart';
+import 'package:template_app/presentation/screens/producto/create_producto_screen.dart';
+import 'package:template_app/presentation/screens/producto/editar_producto_screen.dart';
+import 'package:template_app/presentation/screens/producto/productos_screen.dart';
 import 'package:template_app/presentation/screens/usuario/crear_usuario_screen.dart';
 import 'package:template_app/presentation/screens/usuario/editar_usuario_screen.dart';
 import 'package:template_app/presentation/screens/usuario/usuarios_screen.dart';
@@ -65,5 +69,28 @@ final appRouter = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      name: 'productos',
+      path: '/productos',
+      builder: (_, __) => const ProductosScreen(),
+      routes: [
+        GoRoute(
+          name: 'productoNew',
+          path: 'new',
+          builder: (_, __) => const CrearProductoScreen(),
+        ),
+        GoRoute(
+          name: 'productoEdit',
+          path: ':id/edit',
+          builder: (c, s) => EditarProductoScreen(id: s.pathParameters['id']!),
+        ),
+      ],
+    ),
+    GoRoute(
+      name: 'dev',
+      path: '/dev',
+      builder: (_,__) => InputsCatalogScreen()
+    )
+    
   ],
 );

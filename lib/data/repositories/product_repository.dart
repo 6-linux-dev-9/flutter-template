@@ -1,43 +1,48 @@
+import 'package:template_app/data/models/producto/input/producto_create_model.dart';
+import 'package:template_app/data/models/producto/input/producto_update_model.dart';
+import 'package:template_app/data/models/producto/output/producto_model.dart';
+
 import '../models/product_model.dart';
 import '../remote/api_client.dart';
 
 abstract class ProductRepository {
-  Future<List<ProductModel>> list();
-  Future<ProductModel> findById(String id);
-  Future<void> create(ProductModel p);
-  Future<void> update(ProductModel p);
+  Future<List<ProductoModel>> list();
+  Future<ProductoModel> findById(String id);
+  Future<void> create(ProductoCreateModel p);
+  Future<void> update(String id, ProductoUpdateModel p);
   Future<void> delete(String id);
 }
 
 class ProductRepositoryImpl implements ProductRepository {
   final ApiClient api;
+  static const String basePath = '/producto';
   ProductRepositoryImpl(this.api);
 
   @override
-  Future<List<ProductModel>> list() async {
-    final r = await api.get<List>('/productos');
+  Future<List<ProductoModel>> list() async {
+    final r = await api.get<List>('$basePath/get-list-soft/');
     final data = (r.data as List).cast<Map<String, dynamic>>();
-    return data.map(ProductModel.fromJson).toList();
+    return data.map(ProductoModel.fromJson).toList();
   }
 
   @override
-  Future<ProductModel> findById(String id) async {
-    final r = await api.get<Map<String, dynamic>>('/productos/$id');
-    return ProductModel.fromJson(r.data!);
+  Future<ProductoModel> findById(String id) async {
+    final r = await api.get<Map<String, dynamic>>('$basePath/$id/get/');
+    return ProductoModel.fromJson(r.data!);
   }
 
   @override
-  Future<void> create(ProductModel p) async {
-    await api.post('/productos', data: p.toJson());
+  Future<void> create(ProductoCreateModel p) async {
+    await api.post('$basePath/create/', data: p.toJson());
   }
 
   @override
-  Future<void> update(ProductModel p) async {
-    await api.put('/productos/${p.id}', data: p.toJson());
+  Future<void> update(String id, ProductoUpdateModel p) async {
+    await api.put('$basePath/$id/update/', data: p.toJson());
   }
 
   @override
   Future<void> delete(String id) async {
-    await api.delete('/productos/$id');
+    await api.delete('$basePath/$id/delete/');
   }
 }

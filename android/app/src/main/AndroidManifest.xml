@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Android <= 12 (API 32-): lectura del almacenamiento -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Cámara (si vas a tomar foto directamente) -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:label="template_app"
         android:name="${applicationName}"
