@@ -1,43 +1,10 @@
-// import 'package:go_router/go_router.dart';
-// import 'package:template_app/presentation/screens/usuario/crear_usuario_screen.dart';
-// import 'package:template_app/presentation/screens/usuario/editar_usuario_screen.dart';
-// import 'package:template_app/presentation/screens/usuario/usuarios_screen.dart';
-// import '../../presentation/screens/home/home_screen.dart';
-
-// // import '../../presentation/screens/producto/productos_screen.dart';
-// // import '../../presentation/screens/producto/producto_create.dart';
-// // import '../../presentation/screens/producto/producto_edit.dart';
-
-// final appRouter = GoRouter(
-//   initialLocation: '/',
-//   routes: [
-//     GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
-//     GoRoute(path: '/usuarios', builder: (_, __) => const UsuariosScreen()),
-//     GoRoute(
-//       path: '/usuarios/new',
-//       builder: (_, __) => const CrearUsuarioScreen(),
-//     ),
-//     GoRoute(
-//       path: '/usuarios/:id/edit',
-//       builder: (c, s) => EditarUsuarioScreen(id: s.pathParameters['id']!),
-//     ),
-//     // GoRoute(path: '/productos', builder: (_, __) => const ProductosScreen()),
-//     // GoRoute(path: '/productos/new', builder: (_, __) => const ProductoCreate()),
-//     // GoRoute(
-//     //   path: '/productos/:id/edit',
-//     //   builder: (c, s) => ProductoEdit(id: s.pathParameters['id']!),
-//     // ),
-//   ],
-// );
-
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/presentation/screens/dev/inputs.dart';
 import 'package:template_app/presentation/screens/producto/create_producto_screen.dart';
 import 'package:template_app/presentation/screens/producto/editar_producto_screen.dart';
 import 'package:template_app/presentation/screens/producto/productos_screen.dart';
-import 'package:template_app/presentation/screens/usuario/crear_usuario_screen.dart';
+import 'package:template_app/presentation/screens/usuario/crear_usuario_2.dart';
 import 'package:template_app/presentation/screens/usuario/editar_usuario_screen.dart';
 import 'package:template_app/presentation/screens/usuario/usuarios_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';

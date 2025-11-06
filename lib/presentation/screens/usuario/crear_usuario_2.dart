@@ -1,11 +1,12 @@
-// lib/presentation/screens/usuario/crear_usuario_screen.dart
-import 'dart:io';
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/usuario/input/user_create_model.dart';
+import 'package:template_app/presentation/forms/form_card.dart';
+import 'package:template_app/presentation/forms/form_section.dart';
 import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class CrearUsuarioScreen extends ConsumerStatefulWidget {
@@ -17,7 +18,6 @@ class CrearUsuarioScreen extends ConsumerStatefulWidget {
 
 class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
   final _formKey = GlobalKey<FormState>();
-  //variante solo campo String y numerico
   final _nombre = TextEditingController();
   final _email = TextEditingController();
   bool _loading = false;
@@ -30,9 +30,9 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
   }
 
   Future<void> _submit() async {
-    final repo = ref.read(userRepositoryProvider);
 
     if (!_formKey.currentState!.validate()) return;
+    final repo = ref.read(userRepositoryProvider);
 
     setState(() => _loading = true);
     try {
@@ -47,7 +47,7 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Usuario creado con éxito')));
-      context.pop(true); // vuelve a la lista
+      context.pop(true);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -62,12 +62,10 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final enableBlur =
-        Platform.isIOS; // blur pesado solo en iOS para evitar jank
+    final enableBlur = Platform.isIOS;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -83,18 +81,15 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
       ),
       body: Stack(
         children: [
-          // Fondo degradado suave
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
+                colors: [cs.primaryContainer.withOpacity(0.55), cs.background],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [cs.primaryContainer.withOpacity(0.55), cs.background],
               ),
             ),
           ),
-
-          // Contenido
           SafeArea(
             child: Center(
               child: ConstrainedBox(
@@ -118,14 +113,14 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Completa los datos básicos para registrar un nuevo usuario.',
+                          'Completa los datos básicos del nuevo usuario.',
                           style: text.bodyMedium?.copyWith(
                             color: cs.onBackground.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        // Card translúcida / simple
+                        // Card translúcida
                         ClipRRect(
                           borderRadius: BorderRadius.circular(18),
                           child:
@@ -135,34 +130,9 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
                                       sigmaX: 12,
                                       sigmaY: 12,
                                     ),
-                                    child: GlassCard(
-                                      child: _buildForm(context),
-                                    ),
+                                    child: GlassCard(child: _form()),
                                   )
-                                  : GlassCard(child: _buildForm(context)),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Tip iOS-y
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              size: 18,
-                              color: cs.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Podrás editar estos datos más adelante desde la lista de usuarios.',
-                                style: text.bodySmall?.copyWith(
-                                  color: cs.onBackground.withOpacity(0.7),
-                                ),
-                              ),
-                            ),
-                          ],
+                                  : GlassCard(child: _form()),
                         ),
                       ],
                     ),
@@ -171,8 +141,6 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
               ),
             ),
           ),
-
-          // Capa de loading
           if (_loading)
             Positioned.fill(
               child: IgnorePointer(
@@ -188,63 +156,69 @@ class _CrearUsuarioScreenState extends ConsumerState<CrearUsuarioScreen> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _form() {
     final cs = Theme.of(context).colorScheme;
 
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Nombre
-          TextFormField(
-            controller: _nombre,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
-              hintText: 'Ej. Juan Pérez',
-              prefixIcon: Icon(Icons.person_outline),
+          // === Sección 1: Datos principales ===
+          FormSection(
+            title: 'Datos del usuario',
+            child: FormCard(
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nombre,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator:
+                        (v) =>
+                            (v == null || v.trim().isEmpty)
+                                ? 'Requerido'
+                                : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _email,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Correo electrónico',
+                      prefixIcon: Icon(Icons.alternate_email),
+                    ),
+                    validator: (v) {
+                      final val = v?.trim() ?? '';
+                      if (val.isEmpty) return 'Requerido';
+                      if (!val.contains('@')) return 'Email inválido';
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
-            validator:
-                (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
           ),
-          const SizedBox(height: 12),
 
-          // Email
-          TextFormField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              hintText: 'ejemplo@correo.com',
-              prefixIcon: Icon(Icons.alternate_email),
-            ),
-            validator: (v) {
-              final val = v?.trim() ?? '';
-              if (val.isEmpty) return 'Requerido';
-              if (!val.contains('@')) return 'Email inválido';
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
 
-          // Botones
+          // === Botones ===
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: _loading ? null : () {
-                    if(context.canPop()){
-                      context.pop();
-                    }else{
-                      context.go('/usuarios');
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
+                  onPressed:
+                      _loading
+                          ? null
+                          : () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/usuarios');
+                            }
+                          },
                   child: const Text('Cancelar'),
                 ),
               ),

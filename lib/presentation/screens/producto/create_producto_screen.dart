@@ -12,6 +12,7 @@ import 'package:template_app/presentation/forms/inputs/boolean_switch.dart';
 import 'package:template_app/presentation/forms/inputs/date_time_input.dart';
 import 'package:template_app/presentation/forms/inputs/json_text_input.dart';
 import 'package:template_app/presentation/forms/inputs/number_input.dart';
+import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class CrearProductoScreen extends ConsumerStatefulWidget {
   const CrearProductoScreen({super.key});
@@ -23,15 +24,15 @@ class CrearProductoScreen extends ConsumerStatefulWidget {
 
 class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
   final _formKey = GlobalKey<FormState>();
-
+  //variante solo campo String y numerico, json
   final _nombre = TextEditingController();
   final _precio = TextEditingController();
   final _diagrama = TextEditingController();
-
+  //variables boolean,fechas
   bool _esCaro = false;
-  bool _loading = false;
   DateTime? _fechaCreacion = DateTime.now();
-
+  bool _loading = false;
+//esas variables se las coloca en el dispose
   @override
   void dispose() {
     _nombre.dispose();
@@ -41,13 +42,15 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
   }
 
   Future<void> _submit() async {
-    final repo = ref.read(productRepositoryProvider);
+    //generar el nombre del repo
 
     if (!_formKey.currentState!.validate()) return;
+    final repo = ref.read(productRepositoryProvider);
 
     setState(() => _loading = true);
     try {
       await repo.create(
+        //variante generar el nombre del Create
         ProductoCreateModel(
           nombre: _nombre.text.trim(),
           precio: double.tryParse(_precio.text.trim()) ?? 0,
@@ -87,9 +90,11 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
         leading: IconButton(
           tooltip: 'Volver',
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) context.pop();
+          },
         ),
-        title: const Text('Nuevo producto'),
+        title: const Text('Nuevo producto'),//variante
       ),
       body: Stack(
         children: [
@@ -116,13 +121,14 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Crear producto',
+                          'Crear producto',//variante
                           style: text.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Text(
+                        Text(//variante
                           'Registra un nuevo producto con sus atributos.',
                           style: text.bodyMedium?.copyWith(
                             color: cs.onBackground.withOpacity(0.7),
@@ -139,9 +145,9 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
                                       sigmaX: 12,
                                       sigmaY: 12,
                                     ),
-                                    child: _GlassCard(child: _form()),
+                                    child: GlassCard(child: _form()),
                                   )
-                                  : _GlassCard(child: _form()),
+                                  : GlassCard(child: _form()),
                         ),
                       ],
                     ),
@@ -167,7 +173,6 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
 
   Widget _form() {
     final cs = Theme.of(context).colorScheme;
-    // Si deseas, puedes iniciar en hoy: _fechaCreacion = DateTime.now();
 
     return Form(
       key: _formKey,
@@ -250,33 +255,53 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: _loading ? null : () => context.pop(),
+                  onPressed: _loading ? null : () {
+                    if(context.canPop()){
+                      context.pop();
+                    }else{
+                      context.go('/productos');
+                    }
+                  },
                   child: const Text('Cancelar'),
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
+              // Expanded(
+              //   child: FilledButton.icon(
+              //     onPressed:
+              //         _loading
+              //             ? null
+              //             : () {
+              //               if (_formKey.currentState!.validate()) {
+              //                 if (_fechaCreacion == null) {
+              //                   ScaffoldMessenger.of(context).showSnackBar(
+              //                     const SnackBar(
+              //                       content: Text('Selecciona la fecha'),
+              //                     ),
+              //                   );
+              //                   return;
+              //                 }
+              //                 _submit();
+              //               }
+              //             },
+              //     icon: const Icon(Icons.save_outlined),
+              //     label: const Text('Guardar'),
+              //     style: FilledButton.styleFrom(
+              //       padding: const EdgeInsets.symmetric(vertical: 14),
+              //       backgroundColor: cs.primary,
+              //     ),
+              //   ),
+              // ),
+               Expanded(
                 child: FilledButton.icon(
-                  onPressed:
-                      _loading
-                          ? null
-                          : () {
-                            if (_formKey.currentState!.validate()) {
-                              if (_fechaCreacion == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Selecciona la fecha'),
-                                  ),
-                                );
-                                return;
-                              }
-                              _submit();
-                            }
-                          },
+                  onPressed: _loading ? null : _submit,
                   icon: const Icon(Icons.save_outlined),
                   label: const Text('Guardar'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     backgroundColor: cs.primary,
                   ),
                 ),
@@ -288,20 +313,4 @@ class _CrearProductoScreenState extends ConsumerState<CrearProductoScreen> {
     );
   }
 
-}
-
-class _GlassCard extends StatelessWidget {
-  final Widget child;
-  const _GlassCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Card(
-      elevation: 10,
-      color: Colors.white.withOpacity(0.85),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Container(padding: const EdgeInsets.all(16), child: child),
-    );
-  }
 }

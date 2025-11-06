@@ -4,11 +4,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/usuario/input/user_update_model.dart';
-// Si tu repo.update requiere un modelo tipado de entrada, importa aquí:
-// import 'package:template_app/data/models/usuario/input/user_update_model.dart';
-// Y si usas un modelo de salida para el provider por id, impórtalo también.
+import 'package:template_app/presentation/forms/form_card.dart';
+import 'package:template_app/presentation/forms/form_section.dart';
+import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class EditarUsuarioScreen extends ConsumerStatefulWidget {
   final String id;
@@ -23,8 +24,9 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombre = TextEditingController();
   final _email = TextEditingController();
+
+  bool _hydrated = false;
   bool _loading = false;
-  bool _hydrated = false; // evita rehidratar en cada rebuild
 
   @override
   void dispose() {
@@ -35,12 +37,10 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     final repo = ref.read(userRepositoryProvider);
+
     setState(() => _loading = true);
     try {
-      // Ajusta según tu firma real:
-      // await repo.update(widget.id, {'nombre': _nombre.text.trim(), 'email': _email.text.trim()});
       await repo.update(
         widget.id,
         UsuarioUpdateModel(
@@ -50,10 +50,10 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Usuario actualizado')));
-      context.pop(); // volver a la pantalla anterior
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario actualizado con éxito')),
+      );
+      context.pop(true);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -66,34 +66,19 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final uAsync = ref.watch(usuarioByIdProvider(widget.id));
     final cs = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final enableBlur = Platform.isIOS; // blur pesado solo en iOS
-
-    final uAsync = ref.watch(usuarioByIdProvider(widget.id));
+    final enableBlur = Platform.isIOS;
 
     return uAsync.when(
       loading:
           () => const Scaffold(
             body: SafeArea(child: Center(child: CircularProgressIndicator())),
           ),
-      error:
-          (e, _) => Scaffold(
-            appBar: AppBar(
-              title: const Text('Editar usuario'),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                onPressed:
-                    () =>
-                        context.canPop()
-                            ? context.pop()
-                            : context.go('/usuarios'),
-              ),
-            ),
-            body: Center(child: Text('Error: $e')),
-          ),
+      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
       data: (u) {
-        // hidrata campos una sola vez
+        // Hidratar datos solo una vez
         if (!_hydrated && u != null) {
           _nombre.text = u.nombre ?? '';
           _email.text = u.email ?? '';
@@ -102,7 +87,6 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
 
         return Scaffold(
           extendBodyBehindAppBar: true,
-          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -126,16 +110,17 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
                     colors: [
                       cs.primaryContainer.withOpacity(0.55),
                       cs.background,
                     ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
 
+              // Contenido principal
               SafeArea(
                 child: Center(
                   child: ConstrainedBox(
@@ -159,14 +144,14 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Actualiza los datos y guarda los cambios.',
+                              'Actualiza los datos del usuario y guarda los cambios.',
                               style: text.bodyMedium?.copyWith(
                                 color: cs.onBackground.withOpacity(0.7),
                               ),
                             ),
                             const SizedBox(height: 20),
 
-                            // Card translúcida
+                            // GlassCard con el formulario
                             ClipRRect(
                               borderRadius: BorderRadius.circular(18),
                               child:
@@ -176,33 +161,9 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
                                           sigmaX: 12,
                                           sigmaY: 12,
                                         ),
-                                        child: _GlassCard(
-                                          child: _buildForm(context),
-                                        ),
+                                        child: GlassCard(child: _form()),
                                       )
-                                      : _GlassCard(child: _buildForm(context)),
-                            ),
-
-                            const SizedBox(height: 18),
-
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  size: 18,
-                                  color: cs.primary,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Los cambios serán visibles inmediatamente en la lista.',
-                                    style: text.bodySmall?.copyWith(
-                                      color: cs.onBackground.withOpacity(0.7),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                      : GlassCard(child: _form()),
                             ),
                           ],
                         ),
@@ -212,6 +173,7 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
                 ),
               ),
 
+              // Capa de loading
               if (_loading)
                 Positioned.fill(
                   child: IgnorePointer(
@@ -229,58 +191,72 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _form() {
     final cs = Theme.of(context).colorScheme;
 
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextFormField(
-            controller: _nombre,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
-              hintText: 'Ej. Juan Pérez',
-              prefixIcon: Icon(Icons.person_outline),
+          // Sección principal
+          FormSection(
+            title: 'Datos del usuario',
+            child: FormCard(
+              child: Column(
+                children: [
+                  // Nombre
+                  TextFormField(
+                    controller: _nombre,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator:
+                        (v) =>
+                            (v == null || v.trim().isEmpty)
+                                ? 'Requerido'
+                                : null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Email
+                  TextFormField(
+                    controller: _email,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Correo electrónico',
+                      prefixIcon: Icon(Icons.alternate_email),
+                    ),
+                    validator: (v) {
+                      final val = v?.trim() ?? '';
+                      if (val.isEmpty) return 'Requerido';
+                      if (!val.contains('@')) return 'Email inválido';
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
-            validator:
-                (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
           ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              hintText: 'ejemplo@correo.com',
-              prefixIcon: Icon(Icons.alternate_email),
-            ),
-            validator: (v) {
-              final val = v?.trim() ?? '';
-              if (val.isEmpty) return 'Requerido';
-              if (!val.contains('@')) return 'Email inválido';
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 30),
+
+          // Botones inferiores
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go('/usuarios');
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
+                  onPressed:
+                      _loading
+                          ? null
+                          : () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/usuarios');
+                            }
+                          },
                   child: const Text('Cancelar'),
                 ),
               ),
@@ -306,56 +282,3 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
     );
   }
 }
-
-/// Card con estética “glass”
-class _GlassCard extends StatelessWidget {
-  final Widget child;
-  const _GlassCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Card(
-      elevation: 10,
-      shadowColor: Colors.black12,
-      color: Colors.white.withOpacity(0.85),
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.zero,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.all(16),
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            inputDecorationTheme: Theme.of(
-              context,
-            ).inputDecorationTheme.copyWith(
-              filled: true,
-              fillColor: cs.surface.withOpacity(0.9),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 14,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: Colors.black12.withOpacity(0.06)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: Colors.black12.withOpacity(0.06)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: cs.primary, width: 1.4),
-              ),
-              labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
