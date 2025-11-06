@@ -5,13 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:template_app/core/di/providers/objeto_provider.dart';
+import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/objeto/input/objeto_update_model.dart';
+import 'package:template_app/data/models/usuario/output/user_model.dart';
 import 'package:template_app/presentation/forms/form_card.dart';
 import 'package:template_app/presentation/forms/form_section.dart';
 import 'package:template_app/presentation/forms/inputs/boolean_switch.dart';
 import 'package:template_app/presentation/forms/inputs/date_time_input.dart';
 import 'package:template_app/presentation/forms/inputs/json_text_input.dart';
 import 'package:template_app/presentation/forms/inputs/number_input.dart';
+import 'package:template_app/presentation/forms/inputs/select_input_modified.dart';
 import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class EditarObjetoScreen extends ConsumerStatefulWidget {
@@ -36,7 +39,8 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
   DateTime? _fecha_reserva = DateTime.now();
   bool _hydrated = false;
   bool _loading = false;
-
+  dynamic _usuarioSeleccionado;
+  
   @override
   void dispose() {
     _nombre.dispose();
@@ -63,6 +67,7 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
           valor_de_verdad: _valor_de_verdad,
           campo: _campo.text.trim(),
           valor_entero: int.tryParse(_valor_entero.text.trim()) ?? 0,
+          usuario_id: _usuarioSeleccionado?.id,
         ),
       );
 
@@ -103,7 +108,19 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
           _valor_entero.text = o.valor_entero.toString();
           _valor_de_verdad = o.valor_de_verdad;
           _fecha_reserva = o.fecha_reserva ?? DateTime.now();
+           if (o.usuario_id != null) {
+            final usuariosAsync = ref.read(usuariosProvider);
+            usuariosAsync.whenData((usuarios) {
+              final seleccionado = usuarios.firstWhere(
+                (u) => u.id == o.usuario_id,
+               // orElse: () => null,
+              );
+              if (mounted) setState(() => _usuarioSeleccionado = seleccionado);
+            });
+          }
           _hydrated = true;
+          
+
         }
 
         return Scaffold(
@@ -204,6 +221,8 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
 
   Widget _form() {
     final cs = Theme.of(context).colorScheme;
+    final usuariosAsync = ref.watch(usuariosProvider);
+
 
     return Form(
       key: _formKey,
@@ -275,6 +294,25 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
               ),
             ),
           ),
+          FormSection(
+            title: 'Usuario asociado',
+            child: FormCard(
+              child: usuariosAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text('Error al cargar usuarios: $e'),
+                data:
+                    (usuarios) => SelectInputModified<UsuarioModel>(
+                      items: usuarios,
+                      value: _usuarioSeleccionado,
+                      onChanged:
+                          (u) => setState(() => _usuarioSeleccionado = u),
+                      itemLabel: (u) => u.toStringModified(),
+                      label: 'Selecciona un usuario',
+                    ),
+              ),
+            ),
+          ),
+
 
           const SizedBox(height: 16),
 

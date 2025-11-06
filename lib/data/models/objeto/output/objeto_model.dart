@@ -8,6 +8,7 @@ class ObjetoModel {
   final bool valor_de_verdad;
   final String campo;
   final int valor_entero;
+  final int? usuario_id;
 
   ObjetoModel({
     required this.id,
@@ -18,6 +19,7 @@ class ObjetoModel {
     required this.valor_de_verdad,
     required this.campo,
     required this.valor_entero,
+    required this.usuario_id,
   });
 
   factory ObjetoModel.fromJson(Map<String, dynamic> json) => ObjetoModel(
@@ -32,6 +34,12 @@ class ObjetoModel {
     valor_de_verdad: json['valor_de_verdad'] ?? false,
     campo: json['campo'] ?? '',
     valor_entero: json['valor_entero'] ?? 0,
+    usuario_id:
+        json['usuario'] is Map<String, dynamic>
+            ? (json['usuario']['id'] is int
+                ? json['usuario']['id'] as int
+                : null)
+            : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -43,5 +51,15 @@ class ObjetoModel {
     'valor_de_verdad': valor_de_verdad,
     'campo': campo,
     'valor_entero': valor_entero,
+    'usuario_id': usuario_id,
   };
+  @override
+  String toString() =>
+      '[$id, $nombre, $valor_numerico, $diagrama, $fecha_reserva, $valor_de_verdad, $campo, $valor_entero, $usuario_id]';
+
+  String toStringModified({int maxLength = 25}) {
+    final raw =
+        '[$id, $nombre, $valor_numerico, $diagrama, $fecha_reserva, $valor_de_verdad, $campo, $valor_entero, $usuario_id]';
+    return (raw.length > maxLength) ? '${raw.substring(0, maxLength)}...' : raw;
+  }
 }

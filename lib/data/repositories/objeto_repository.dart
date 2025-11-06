@@ -1,4 +1,3 @@
-
 import 'package:template_app/data/models/objeto/input/objeto_create_model.dart';
 import 'package:template_app/data/models/objeto/input/objeto_update_model.dart';
 import 'package:template_app/data/models/objeto/output/objeto_model.dart';
@@ -33,6 +32,8 @@ class ObjetoRepositoryImpl implements ObjetoRepository {
 
   @override
   Future<void> create(ObjetoCreateModel p) async {
+    print("repo create");
+    print(p.toString());
     await api.post('$basePath/create/', data: p.toJson());
   }
 

@@ -5,13 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:template_app/core/di/providers/objeto_provider.dart';
+import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/objeto/input/objeto_create_model.dart';
+import 'package:template_app/data/models/usuario/output/user_model.dart';
 import 'package:template_app/presentation/forms/form_card.dart';
 import 'package:template_app/presentation/forms/form_section.dart';
 import 'package:template_app/presentation/forms/inputs/boolean_switch.dart';
 import 'package:template_app/presentation/forms/inputs/date_time_input.dart';
 import 'package:template_app/presentation/forms/inputs/json_text_input.dart';
 import 'package:template_app/presentation/forms/inputs/number_input.dart';
+import 'package:template_app/presentation/forms/inputs/select_input_modified.dart';
 import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class CrearObjetoScreen extends ConsumerStatefulWidget {
@@ -34,6 +37,7 @@ class _CrearObjetoScreenState extends ConsumerState<CrearObjetoScreen> {
   // Variables de tipo lógico y fecha
   bool _valor_de_verdad = false;
   DateTime? _fecha_reserva = DateTime.now();
+  dynamic _usuarioSeleccionado;
   bool _loading = false;
 
   @override
@@ -51,6 +55,7 @@ class _CrearObjetoScreenState extends ConsumerState<CrearObjetoScreen> {
     final repo = ref.read(objetoRepositoryProvider);
 
     setState(() => _loading = true);
+    //print("usuario seleccionado: "+_usuarioSeleccionado.toString());
     try {
       await repo.create(
         ObjetoCreateModel(
@@ -61,6 +66,7 @@ class _CrearObjetoScreenState extends ConsumerState<CrearObjetoScreen> {
           valor_de_verdad: _valor_de_verdad,
           campo: _campo.text.trim(),
           valor_entero: int.tryParse(_valor_entero.text.trim()) ?? 0,
+          usuario_id: _usuarioSeleccionado?.id,
         ),
       );
 
@@ -182,6 +188,7 @@ class _CrearObjetoScreenState extends ConsumerState<CrearObjetoScreen> {
 
   Widget _form() {
     final cs = Theme.of(context).colorScheme;
+    final usuariosAsync = ref.watch(usuariosProvider);
 
     return Form(
       key: _formKey,
@@ -264,6 +271,26 @@ class _CrearObjetoScreenState extends ConsumerState<CrearObjetoScreen> {
 
           const SizedBox(height: 30),
 
+          FormSection(
+            title: 'Usuario asociado',
+            child: FormCard(
+              child: usuariosAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text('Error al cargar usuarios: $e'),
+                data:
+                    (usuarios) => SelectInputModified<UsuarioModel>(
+                      items: usuarios,
+                      value: _usuarioSeleccionado,
+                      onChanged:
+                          (u) => setState(() => _usuarioSeleccionado = u),
+                      itemLabel: (u) => u.toStringModified(),
+                      label: 'Selecciona un usuario',
+                       equals: (a, b) => a.id == b.id, 
+                    ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           // ================= BOTONES =================
           Row(
             children: [

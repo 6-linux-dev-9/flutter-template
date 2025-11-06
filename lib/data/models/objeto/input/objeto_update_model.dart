@@ -7,6 +7,7 @@ class ObjetoUpdateModel {
   final bool valor_de_verdad;
   final String campo;
   final int valor_entero;
+  final int? usuario_id;
 
   ObjetoUpdateModel({
     required this.nombre,
@@ -16,6 +17,7 @@ class ObjetoUpdateModel {
     required this.valor_de_verdad,
     required this.campo,
     required this.valor_entero,
+    required this.usuario_id,
   });
 
   Map<String, dynamic> toJson() => {
@@ -26,5 +28,7 @@ class ObjetoUpdateModel {
     'valor_de_verdad': valor_de_verdad,
     'campo': campo,
     'valor_entero': valor_entero,
+    'usuario_id': usuario_id,
   };
 }
+

@@ -7,6 +7,7 @@ class ObjetoCreateModel {
   final bool valor_de_verdad;
   final String campo;
   final int valor_entero;
+  final int? usuario_id;
 
   ObjetoCreateModel({
     required this.nombre,
@@ -16,6 +17,7 @@ class ObjetoCreateModel {
     required this.valor_de_verdad,
     required this.campo,
     required this.valor_entero,
+    required this.usuario_id,
   });
 
   Map<String, dynamic> toJson() => {
@@ -26,5 +28,10 @@ class ObjetoCreateModel {
     'valor_de_verdad': valor_de_verdad,
     'campo': campo,
     'valor_entero': valor_entero,
+    'usuarioId': usuario_id,
   };
+  @override
+  String toString() {
+    return 'ObjetoCreateModel(nombre: $nombre, valor_numerico: $valor_numerico, diagrama: $diagrama, fecha_reserva: $fecha_reserva, valor_de_verdad: $valor_de_verdad, campo: $campo, valor_entero: $valor_entero, usuario_id: $usuario_id)';
+  }
 }
