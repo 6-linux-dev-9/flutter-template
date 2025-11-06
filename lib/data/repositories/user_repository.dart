@@ -19,7 +19,7 @@ class UserRepositoryImpl implements UserRepository {
 //static const String API_URL = "http://192.168.100.4:8000/api";
   @override
   Future<List<UsuarioModel>> list() async {
-    final r = await api.get<List>('$_base/get-list-soft/'); // ← ajusta endpoints
+    final r = await api.get<List>('$_base/get-list/'); // ← ajusta endpoints
     final data = (r.data as List).cast<Map<String, dynamic>>();
     return data.map(UsuarioModel.fromJson).toList();
   }

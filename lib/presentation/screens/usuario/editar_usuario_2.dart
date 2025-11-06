@@ -9,6 +9,7 @@ import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/usuario/input/user_update_model.dart';
 import 'package:template_app/presentation/forms/form_card.dart';
 import 'package:template_app/presentation/forms/form_section.dart';
+import 'package:template_app/presentation/forms/inputs/select_input.dart';
 import 'package:template_app/presentation/widgets/glass_card.dart';
 
 class EditarUsuarioScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombre = TextEditingController();
   final _email = TextEditingController();
+  String? _estadoSeleccionado;
 
   bool _hydrated = false;
   bool _loading = false;
@@ -46,9 +48,10 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
         UsuarioUpdateModel(
           nombre: _nombre.text.trim(),
           email: _email.text.trim(),
+          estado: _estadoSeleccionado ?? 'activo',
         ),
       );
-
+      ref.invalidate(usuariosProvider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario actualizado con éxito')),
@@ -82,7 +85,9 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
         if (!_hydrated && u != null) {
           _nombre.text = u.nombre ?? '';
           _email.text = u.email ?? '';
+          _estadoSeleccionado = u.estado.isNotEmpty ? u.estado : 'activo';
           _hydrated = true;
+
         }
 
         return Scaffold(
@@ -241,6 +246,26 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
           ),
 
           const SizedBox(height: 30),
+          FormSection(
+            title: 'Estado del Usuario',
+            child: FormCard(
+              child: Column(
+                children: [
+                  SelectInput<String>(
+                    items: const ['activo', 'eliminado'],
+                    value: _estadoSeleccionado,
+                    onChanged: (v) => setState(() => _estadoSeleccionado = v),
+                    itemLabel: (v) => v.toUpperCase(),
+                    label: 'Estado',
+                    equals: (a, b) => a.toLowerCase() == b.toLowerCase(),
+                  ),
+  
+                 
+                ],
+              ),
+            ),
+          ),
+
 
           // Botones inferiores
           Row(

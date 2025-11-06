@@ -9,6 +9,8 @@ class ObjetoModel {
   final String campo;
   final int valor_entero;
   final int? usuario_id;
+  final DateTime? fechaEliminacion;
+  final String estado;
 
   ObjetoModel({
     required this.id,
@@ -20,6 +22,8 @@ class ObjetoModel {
     required this.campo,
     required this.valor_entero,
     required this.usuario_id,
+    required this.fechaEliminacion,
+    required this.estado,
   });
 
   factory ObjetoModel.fromJson(Map<String, dynamic> json) => ObjetoModel(
@@ -40,6 +44,11 @@ class ObjetoModel {
                 ? json['usuario']['id'] as int
                 : null)
             : null,
+    fechaEliminacion:
+        json['fechaEliminacion'] != null
+            ? DateTime.parse(json['deletedAt'])
+            : null,
+    estado: json['estado'] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -52,12 +61,13 @@ class ObjetoModel {
     'campo': campo,
     'valor_entero': valor_entero,
     'usuario_id': usuario_id,
+    'estado': estado,
   };
   @override
   String toString() =>
       '[$id, $nombre, $valor_numerico, $diagrama, $fecha_reserva, $valor_de_verdad, $campo, $valor_entero, $usuario_id]';
 
-  String toStringModified({int maxLength = 25}) {
+  String toStringModified({int maxLength = 15}) {
     final raw =
         '[$id, $nombre, $valor_numerico, $diagrama, $fecha_reserva, $valor_de_verdad, $campo, $valor_entero, $usuario_id]';
     return (raw.length > maxLength) ? '${raw.substring(0, maxLength)}...' : raw;

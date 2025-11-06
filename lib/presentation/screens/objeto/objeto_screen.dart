@@ -180,6 +180,21 @@ class ObjetoScreen extends ConsumerWidget {
                                   ? o.fecha_reserva!.toPretty()
                                   : 'N/A',
                         ),
+                        const SizedBox(height: 4),
+
+                        FieldLine(
+                          label: 'estado',
+                          value: o.estado
+                        ),
+                        
+                        const SizedBox(height: 4),
+
+                        FieldLine(
+                          label: 'fecha_eliminacion',
+                          value:o.fecha_reserva!.toPretty()
+                            
+                        ),
+                        const SizedBox(height: 4),
                         FieldLine(
                           label: 'usuario',
                           value:

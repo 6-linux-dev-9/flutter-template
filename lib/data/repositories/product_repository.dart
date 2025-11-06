@@ -18,7 +18,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<List<ProductoModel>> list() async {
-    final r = await api.get<List>('$basePath/get-list-soft/');
+    final r = await api.get<List>('$basePath/get-list/');
     final data = (r.data as List).cast<Map<String, dynamic>>();
     return data.map(ProductoModel.fromJson).toList();
   }

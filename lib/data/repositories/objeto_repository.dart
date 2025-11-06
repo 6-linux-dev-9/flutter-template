@@ -19,7 +19,7 @@ class ObjetoRepositoryImpl implements ObjetoRepository {
 
   @override
   Future<List<ObjetoModel>> list() async {
-    final r = await api.get<List>('$basePath/get-list-soft/');
+    final r = await api.get<List>('$basePath/get-list/');
     final data = (r.data as List).cast<Map<String, dynamic>>();
     return data.map(ObjetoModel.fromJson).toList();
   }
@@ -39,6 +39,8 @@ class ObjetoRepositoryImpl implements ObjetoRepository {
 
   @override
   Future<void> update(String id, ObjetoUpdateModel p) async {
+    print("repo update");
+    print(p.toString());
     await api.put('$basePath/$id/update/', data: p.toJson());
   }
 

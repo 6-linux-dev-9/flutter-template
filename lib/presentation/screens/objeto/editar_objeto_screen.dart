@@ -14,6 +14,7 @@ import 'package:template_app/presentation/forms/inputs/boolean_switch.dart';
 import 'package:template_app/presentation/forms/inputs/date_time_input.dart';
 import 'package:template_app/presentation/forms/inputs/json_text_input.dart';
 import 'package:template_app/presentation/forms/inputs/number_input.dart';
+import 'package:template_app/presentation/forms/inputs/select_input.dart';
 import 'package:template_app/presentation/forms/inputs/select_input_modified.dart';
 import 'package:template_app/presentation/widgets/glass_card.dart';
 
@@ -39,6 +40,7 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
   DateTime? _fecha_reserva = DateTime.now();
   bool _hydrated = false;
   bool _loading = false;
+  String? _estadoSeleccionado;
   dynamic _usuarioSeleccionado;
   
   @override
@@ -67,10 +69,11 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
           valor_de_verdad: _valor_de_verdad,
           campo: _campo.text.trim(),
           valor_entero: int.tryParse(_valor_entero.text.trim()) ?? 0,
-          usuario_id: _usuarioSeleccionado?.id,
+         usuario_id: _usuarioSeleccionado?.id,
+         estado: _estadoSeleccionado ?? 'activo'
         ),
       );
-
+      ref.invalidate(objetoProvider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Objeto actualizado con éxito')),
@@ -118,6 +121,7 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
               if (mounted) setState(() => _usuarioSeleccionado = seleccionado);
             });
           }
+          _estadoSeleccionado = o.estado ?? 'activo';
           _hydrated = true;
           
 
@@ -294,6 +298,25 @@ class _EditarObjetoScreenState extends ConsumerState<EditarObjetoScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          FormSection(
+            title: 'Estado del producto',
+            child: FormCard(
+              child: Column(
+                children: [
+                  SelectInput<String>(
+                    items: const ['activo', 'eliminado'],
+                    value: _estadoSeleccionado,
+                    onChanged: (v) => setState(() => _estadoSeleccionado = v),
+                    itemLabel: (v) => v.toUpperCase(),
+                    label: 'Estado',
+                  ),
+                  
+                ],
+              ),
+            ),
+          ),
+
           FormSection(
             title: 'Usuario asociado',
             child: FormCard(

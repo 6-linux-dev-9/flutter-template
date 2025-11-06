@@ -12,6 +12,6 @@ final productosProvider = FutureProvider<List<ProductoModel>>((ref) async {
   return ref.read(productRepositoryProvider).list();
 });
 
-final productoByIdProvider = FutureProvider.family<ProductoModel, String>(
+final productoByIdProvider = FutureProvider.autoDispose.family<ProductoModel, String>(
   (ref, id) async => ref.read(productRepositoryProvider).findById(id),
 );

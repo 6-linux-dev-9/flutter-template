@@ -8,6 +8,7 @@ class ObjetoUpdateModel {
   final String campo;
   final int valor_entero;
   final int? usuario_id;
+  final String estado;
 
   ObjetoUpdateModel({
     required this.nombre,
@@ -18,6 +19,7 @@ class ObjetoUpdateModel {
     required this.campo,
     required this.valor_entero,
     required this.usuario_id,
+    required this.estado    
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,7 +30,8 @@ class ObjetoUpdateModel {
     'valor_de_verdad': valor_de_verdad,
     'campo': campo,
     'valor_entero': valor_entero,
-    'usuario_id': usuario_id,
+    'usuarioId':usuario_id,
+    'estado': estado.toLowerCase()
   };
 }
 

@@ -8,7 +8,7 @@ import 'package:template_app/presentation/screens/producto/create_producto_scree
 import 'package:template_app/presentation/screens/producto/editar_producto_screen.dart';
 import 'package:template_app/presentation/screens/producto/productos_screen.dart';
 import 'package:template_app/presentation/screens/usuario/crear_usuario_2.dart';
-import 'package:template_app/presentation/screens/usuario/editar_usuario_screen.dart';
+import 'package:template_app/presentation/screens/usuario/editar_usuario_2.dart';
 import 'package:template_app/presentation/screens/usuario/usuarios_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 

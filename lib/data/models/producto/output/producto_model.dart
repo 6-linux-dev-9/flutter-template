@@ -5,6 +5,8 @@ class ProductoModel {
   final String diagrama; // lo tratamos como string, no lo parseamos todavía
   final String nombre;
   final double precio;
+  final String estado;
+  final DateTime? fechaEliminacion;
 
   ProductoModel({
     required this.id,
@@ -13,6 +15,8 @@ class ProductoModel {
     required this.diagrama,
     required this.nombre,
     required this.precio,
+    required this.estado,
+    required this.fechaEliminacion,
   });
 
   factory ProductoModel.fromJson(Map<String, dynamic> j) => ProductoModel(
@@ -22,6 +26,8 @@ class ProductoModel {
     diagrama: j['diagrama'] ?? '',
     nombre: j['nombre'] ?? '',
     precio: (j['precio'] as num?)?.toDouble() ?? 0.0,
+    estado: j['estado'] ?? '',
+    fechaEliminacion: j['deletedAt'] != null ? DateTime.parse(j['deletedAt']) : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -31,5 +37,6 @@ class ProductoModel {
     'diagrama': diagrama,
     'nombre': nombre,
     'precio': precio,
+    'estado': estado,
   };
 }

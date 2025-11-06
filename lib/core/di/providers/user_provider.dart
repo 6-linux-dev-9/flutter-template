@@ -12,6 +12,6 @@ final usuariosProvider = FutureProvider<List<UsuarioModel>>((ref) async {
   return ref.read(userRepositoryProvider).list();
 });
 
-final usuarioByIdProvider = FutureProvider.family<UsuarioModel, String>(
+final usuarioByIdProvider = FutureProvider.autoDispose.family<UsuarioModel, String>(
   (ref, id) async => ref.read(userRepositoryProvider).findById(id),
 );

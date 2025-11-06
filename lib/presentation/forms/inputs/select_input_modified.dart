@@ -36,6 +36,7 @@ class SelectInputModified<T> extends StatelessWidget {
     final allItems = allowNull ? [null, ...items] : items;
 
     return DropdownButtonFormField<T>(
+      isExpanded: true,
       value: items.where((e) => _eq(e, value)).isNotEmpty ? value : null,
       items:
           allItems

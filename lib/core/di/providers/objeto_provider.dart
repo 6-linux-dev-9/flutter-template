@@ -11,6 +11,6 @@ final objetoProvider = FutureProvider<List<ObjetoModel>>((ref) async {
   return ref.read(objetoRepositoryProvider).list();
 });
 
-final objetoByIdProvider = FutureProvider.family<ObjetoModel, String>(
+final objetoByIdProvider = FutureProvider.autoDispose.family<ObjetoModel, String>(
   (ref, id) async => ref.read(objetoRepositoryProvider).findById(id),
 );

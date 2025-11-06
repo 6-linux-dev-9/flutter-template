@@ -25,7 +25,7 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
   final _email = TextEditingController();
   bool _loading = false;
   bool _hydrated = false; // evita rehidratar en cada rebuild
-
+  String? _estadoSeleccionado;
   @override
   void dispose() {
     _nombre.dispose();
@@ -46,9 +46,10 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
         UsuarioUpdateModel(
           nombre: _nombre.text.trim(),
           email: _email.text.trim(),
+          estado: _estadoSeleccionado ?? 'activo',
         ),
       );
-
+      ref.invalidate(usuariosProvider);
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -97,6 +98,7 @@ class _EditarUsuarioScreenState extends ConsumerState<EditarUsuarioScreen> {
         if (!_hydrated && u != null) {
           _nombre.text = u.nombre ?? '';
           _email.text = u.email ?? '';
+          _estadoSeleccionado = u.estado ?? 'activo';
           _hydrated = true;
         }
 
@@ -358,4 +360,3 @@ class _GlassCard extends StatelessWidget {
     );
   }
 }
-

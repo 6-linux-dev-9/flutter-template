@@ -158,11 +158,21 @@ class ProductosScreen extends ConsumerWidget {
                                   ? p.diagrama.substring(0, 45) + '…'
                                   : p.diagrama,
                         ),
+                        const SizedBox(height: 4),
+                        FieldLine(
+                          label: 'Estado',
+                          value: p.estado
+                        ),
+                        const SizedBox(height: 4),
                         FieldLine(
                           label: 'Fecha de Creación',
                           value: p.fechaCreacion.toPretty(),
                         ),
-
+                        const SizedBox(height: 4),
+                        FieldLine(
+                          label: 'Fecha de Eliminacion',
+                          value: p.fechaEliminacion.toPretty(),
+                        ),
 
                         const SizedBox(height: 12),
                         Row(

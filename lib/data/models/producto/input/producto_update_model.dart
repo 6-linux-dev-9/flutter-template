@@ -4,6 +4,7 @@ class ProductoUpdateModel {
   final String diagrama;
   final String nombre;
   final double precio;
+  final String estado;
 
   ProductoUpdateModel({
     required this.fechaCreacion,
@@ -11,6 +12,7 @@ class ProductoUpdateModel {
     required this.diagrama,
     required this.nombre,
     required this.precio,
+    required this.estado,
   });
 
   factory ProductoUpdateModel.fromJson(Map<String, dynamic> j) =>
@@ -20,6 +22,7 @@ class ProductoUpdateModel {
         diagrama: j['diagrama'] ?? '',
         nombre: j['nombre'] ?? '',
         precio: (j['precio'] as num?)?.toDouble() ?? 0.0,
+        estado: j['estado'] ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -28,5 +31,6 @@ class ProductoUpdateModel {
     'diagrama': diagrama,
     'nombre': nombre,
     'precio': precio,
+    'estado': estado.toLowerCase(),
   };
 }

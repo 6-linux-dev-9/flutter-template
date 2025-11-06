@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/core/di/providers/user_provider.dart';
+import 'package:template_app/core/utils/date_format.dart';
 import 'package:template_app/data/models/usuario/output/user_model.dart';
 import 'package:template_app/presentation/widgets/empty_state.dart';
 import 'package:template_app/presentation/widgets/error_state.dart';
@@ -142,7 +143,13 @@ class UsuariosScreen extends ConsumerWidget {
                         FieldLine(label: 'Nombre', value: u.nombre),
                         const SizedBox(height: 4),
                         FieldLine(label: 'Email', value: u.email),
-
+                        const SizedBox(height: 4),
+                        FieldLine(label: 'Estado', value: u.estado),
+                        const SizedBox(height: 4),
+                        FieldLine(
+                          label: 'Fecha de Eliminacion',
+                          value: u.fechaEliminacion.toPretty(),
+                        ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
