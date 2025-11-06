@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/core/di/providers/user_provider.dart';
 import 'package:template_app/data/models/usuario/output/user_model.dart';
+import 'package:template_app/presentation/widgets/empty_state.dart';
+import 'package:template_app/presentation/widgets/error_state.dart';
+import 'package:template_app/presentation/widgets/field_line.dart';
 
 class UsuariosScreen extends ConsumerWidget {
   const UsuariosScreen({super.key});
@@ -72,14 +75,22 @@ class UsuariosScreen extends ConsumerWidget {
       body: usuarios.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (e, _) => _ErrorState(
+            (e, _) => ErrorState(
               message: 'Error al cargar usuarios',
               details: e.toString(),
               onRetry: () => ref.invalidate(usuariosProvider),
             ),
         data: (list) {
           if (list.isEmpty) {
-            return _EmptyState(onCreate: () => context.push('/usuarios/new'));
+            return EmptyState(
+              title: 'Sin usuarios aún',
+              description: Text('Crea tu primer usuario para empezar.'),
+              action: FilledButton.icon(
+                onPressed: () => context.pushNamed('usuarioNew'),
+                icon: const Icon(Icons.person_add_alt_1),
+                label: const Text('Crear usuario'),
+              ),
+            );
           }
 
           // Pull-to-refresh
@@ -128,9 +139,9 @@ class UsuariosScreen extends ConsumerWidget {
                         const SizedBox(height: 10),
 
                         // Campos “Nombre: … / Email: …”
-                        _FieldLine(label: 'Nombre', value: u.nombre),
+                        FieldLine(label: 'Nombre', value: u.nombre),
                         const SizedBox(height: 4),
-                        _FieldLine(label: 'Email', value: u.email),
+                        FieldLine(label: 'Email', value: u.email),
 
                         const SizedBox(height: 12),
                         Row(
@@ -183,111 +194,111 @@ class UsuariosScreen extends ConsumerWidget {
   }
 }
 
-class _FieldLine extends StatelessWidget {
-  final String label;
-  final String value;
-  const _FieldLine({required this.label, required this.value});
+// class _FieldLine extends StatelessWidget {
+//   final String label;
+//   final String value;
+//   const _FieldLine({required this.label, required this.value});
 
-  @override
-  Widget build(BuildContext context) {
-    final onBg = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
-    return RichText(
-      text: TextSpan(
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.25),
-        children: [
-          TextSpan(
-            text: '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          TextSpan(text: value, style: TextStyle(color: onBg)),
-        ],
-      ),
-    );
-    // Si prefieres SelectableText:
-    // return SelectableText.rich(...)
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final onBg = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+//     return RichText(
+//       text: TextSpan(
+//         style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.25),
+//         children: [
+//           TextSpan(
+//             text: '$label: ',
+//             style: const TextStyle(fontWeight: FontWeight.w600),
+//           ),
+//           TextSpan(text: value, style: TextStyle(color: onBg)),
+//         ],
+//       ),
+//     );
+//     // Si prefieres SelectableText:
+//     // return SelectableText.rich(...)
+//   }
+// }
 
-class _EmptyState extends StatelessWidget {
-  final VoidCallback onCreate;
-  const _EmptyState({required this.onCreate});
+// class _EmptyState extends StatelessWidget {
+//   final VoidCallback onCreate;
+//   const _EmptyState({required this.onCreate});
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.group_outlined, size: 64, color: cs.outline),
-            const SizedBox(height: 12),
-            Text(
-              'Sin usuarios aún',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Crea tu primer usuario para empezar.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onCreate,
-              icon: const Icon(Icons.person_add_alt_1),
-              label: const Text('Crear usuario'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final cs = Theme.of(context).colorScheme;
+//     return Center(
+//       child: Padding(
+//         padding: const EdgeInsets.all(24),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(Icons.group_outlined, size: 64, color: cs.outline),
+//             const SizedBox(height: 12),
+//             Text(
+//               'Sin usuarios aún',
+//               style: Theme.of(context).textTheme.titleMedium,
+//             ),
+//             const SizedBox(height: 6),
+//             Text(
+//               'Crea tu primer usuario para empezar.',
+//               style: Theme.of(
+//                 context,
+//               ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+//             ),
+//             const SizedBox(height: 16),
+//             FilledButton.icon(
+//               onPressed: onCreate,
+//               icon: const Icon(Icons.person_add_alt_1),
+//               label: const Text('Crear usuario'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final String? details;
-  final VoidCallback onRetry;
-  const _ErrorState({
-    required this.message,
-    this.details,
-    required this.onRetry,
-  });
+// class _ErrorState extends StatelessWidget {
+//   final String message;
+//   final String? details;
+//   final VoidCallback onRetry;
+//   const _ErrorState({
+//     required this.message,
+//     this.details,
+//     required this.onRetry,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: cs.error),
-            const SizedBox(height: 12),
-            Text(message, style: Theme.of(context).textTheme.titleMedium),
-            if (details != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                details!,
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-            ],
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final cs = Theme.of(context).colorScheme;
+//     return Center(
+//       child: Padding(
+//         padding: const EdgeInsets.all(24),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(Icons.error_outline, size: 64, color: cs.error),
+//             const SizedBox(height: 12),
+//             Text(message, style: Theme.of(context).textTheme.titleMedium),
+//             if (details != null) ...[
+//               const SizedBox(height: 6),
+//               Text(
+//                 details!,
+//                 textAlign: TextAlign.center,
+//                 style: Theme.of(
+//                   context,
+//                 ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+//               ),
+//             ],
+//             const SizedBox(height: 16),
+//             OutlinedButton.icon(
+//               onPressed: onRetry,
+//               icon: const Icon(Icons.refresh),
+//               label: const Text('Reintentar'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

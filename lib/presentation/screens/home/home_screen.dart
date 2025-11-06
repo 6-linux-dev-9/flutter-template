@@ -22,12 +22,16 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             tooltip: 'Ir a Productos',
             onPressed: () {
-              // context.pushNamed('productos'); // cuando exista la ruta
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Módulo productos no disponible')),
-              );
+              context.pushNamed('productos'); // cuando exista la ruta
             },
             icon: const Icon(Icons.inventory_2),
+          ),
+          IconButton(
+            tooltip: 'Ir a Objeto',
+            onPressed: () {
+              context.pushNamed('objeto'); // cuando exista la ruta
+            },
+            icon: const Icon(Icons.category),
           ),
         ],
       ),
@@ -75,12 +79,14 @@ class HomeScreen extends StatelessWidget {
                     label: 'Nuevo producto',
                     icon: Icons.add_box,
                     onTap: () {
-                      // context.pushNamed('productoNew'); // cuando exista
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Crear producto no disponible'),
-                        ),
-                      );
+                      context.pushNamed('productoNew'); // cuando exista
+                    },
+                  ),
+                  _QuickAction(
+                    label: 'Nuevo Objeto',
+                    icon: Icons.abc_sharp,
+                    onTap: () {
+                      context.pushNamed('objetoNew'); // cuando exista
                     },
                   ),
                 ],
@@ -122,6 +128,16 @@ class HomeScreen extends StatelessWidget {
                           fgColor: color.onTertiaryContainer,
                           onOpenList: () => context.pushNamed('productos'),
                           onCreate: () => context.pushNamed('productoNew'),
+                        ),
+                        _ModuleCard(
+                          title: 'Objeto',
+                          subtitle:
+                              'Administra creacion,eliminacion y edicion de objetos.',
+                          icon: Icons.category,
+                          color: color.tertiaryContainer,
+                          fgColor: color.onTertiaryContainer,
+                          onOpenList: () => context.pushNamed('objetos'),
+                          onCreate: () => context.pushNamed('objetoNew'),
                         ),
                         _ModuleCard(
                           title: 'Reportes (próx.)',

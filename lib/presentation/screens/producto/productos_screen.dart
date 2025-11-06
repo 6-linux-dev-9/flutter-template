@@ -6,6 +6,9 @@ import 'package:template_app/core/di/providers/product_provider.dart';
 import 'package:template_app/core/utils/date_format.dart';
 
 import 'package:template_app/data/models/producto/output/producto_model.dart';
+import 'package:template_app/presentation/widgets/empty_state.dart';
+import 'package:template_app/presentation/widgets/error_state.dart';
+import 'package:template_app/presentation/widgets/field_line.dart';
 
 class ProductosScreen extends ConsumerWidget {
   const ProductosScreen({super.key});
@@ -72,14 +75,22 @@ class ProductosScreen extends ConsumerWidget {
       body: productos.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (e, _) => _ErrorState(
+            (e, _) => ErrorState(
               message: 'Error al cargar productos',
               details: e.toString(),
               onRetry: () => ref.invalidate(productosProvider),
             ),
         data: (list) {
           if (list.isEmpty) {
-            return _EmptyState(onCreate: () => context.push('/productos/new'));
+            return EmptyState(
+              title: 'Sin Productos aún',
+              description: Text('Crea tu primer Producto para empezar.'),
+              action: FilledButton.icon(
+                onPressed: () => context.pushNamed('productoNew'),
+                icon: const Icon(Icons.power_rounded),
+                label: const Text('Crear Producto'),
+              ),
+            );
           }
 
           return RefreshIndicator(
@@ -128,26 +139,26 @@ class ProductosScreen extends ConsumerWidget {
 
                         // Campos
                         // Campos
-                        _FieldLine(label: 'Nombre', value: p.nombre),
+                        FieldLine(label: 'Nombre', value: p.nombre),
                         const SizedBox(height: 4),
 
-                        _FieldLine(label: 'Precio', value: '${p.precio} Bs'),
+                        FieldLine(label: 'Precio', value: '${p.precio} Bs'),
                         const SizedBox(height: 4),
 
-                        _FieldLine(
+                        FieldLine(
                           label: '¿Es caro?',
                           value: p.esCaro ? 'Sí' : 'No',
                         ),
                         const SizedBox(height: 4),
 
-                        _FieldLine(
+                        FieldLine(
                           label: 'Diagrama',
                           value:
                               p.diagrama.length > 45
                                   ? p.diagrama.substring(0, 45) + '…'
                                   : p.diagrama,
                         ),
-                        _FieldLine(
+                        FieldLine(
                           label: 'Fecha de Creación',
                           value: p.fechaCreacion.toPretty(),
                         ),
@@ -189,109 +200,109 @@ class ProductosScreen extends ConsumerWidget {
   }
 }
 
-class _FieldLine extends StatelessWidget {
-  final String label;
-  final String value;
-  const _FieldLine({required this.label, required this.value});
+// class _FieldLine extends StatelessWidget {
+//   final String label;
+//   final String value;
+//   const _FieldLine({required this.label, required this.value});
 
-  @override
-  Widget build(BuildContext context) {
-    final onBg = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
-    return RichText(
-      text: TextSpan(
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.25),
-        children: [
-          TextSpan(
-            text: '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          TextSpan(text: value, style: TextStyle(color: onBg)),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final onBg = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+//     return RichText(
+//       text: TextSpan(
+//         style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.25),
+//         children: [
+//           TextSpan(
+//             text: '$label: ',
+//             style: const TextStyle(fontWeight: FontWeight.w600),
+//           ),
+//           TextSpan(text: value, style: TextStyle(color: onBg)),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-class _EmptyState extends StatelessWidget {
-  final VoidCallback onCreate;
-  const _EmptyState({required this.onCreate});
+// class _EmptyState extends StatelessWidget {
+//   final VoidCallback onCreate;
+//   const _EmptyState({required this.onCreate});
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.inventory_2_outlined, size: 64, color: cs.outline),
-            const SizedBox(height: 12),
-            Text(
-              'Sin productos aún',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Agrega tu primer producto.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onCreate,
-              icon: const Icon(Icons.add),
-              label: const Text('Crear producto'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final cs = Theme.of(context).colorScheme;
+//     return Center(
+//       child: Padding(
+//         padding: const EdgeInsets.all(24),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(Icons.inventory_2_outlined, size: 64, color: cs.outline),
+//             const SizedBox(height: 12),
+//             Text(
+//               'Sin productos aún',
+//               style: Theme.of(context).textTheme.titleMedium,
+//             ),
+//             const SizedBox(height: 6),
+//             Text(
+//               'Agrega tu primer producto.',
+//               style: Theme.of(
+//                 context,
+//               ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+//             ),
+//             const SizedBox(height: 16),
+//             FilledButton.icon(
+//               onPressed: onCreate,
+//               icon: const Icon(Icons.add),
+//               label: const Text('Crear producto'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final String? details;
-  final VoidCallback onRetry;
-  const _ErrorState({
-    required this.message,
-    this.details,
-    required this.onRetry,
-  });
+// class _ErrorState extends StatelessWidget {
+//   final String message;
+//   final String? details;
+//   final VoidCallback onRetry;
+//   const _ErrorState({
+//     required this.message,
+//     this.details,
+//     required this.onRetry,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: cs.error),
-            const SizedBox(height: 12),
-            Text(message, style: Theme.of(context).textTheme.titleMedium),
-            if (details != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                details!,
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-            ],
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final cs = Theme.of(context).colorScheme;
+//     return Center(
+//       child: Padding(
+//         padding: const EdgeInsets.all(24),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(Icons.error_outline, size: 64, color: cs.error),
+//             const SizedBox(height: 12),
+//             Text(message, style: Theme.of(context).textTheme.titleMedium),
+//             if (details != null) ...[
+//               const SizedBox(height: 6),
+//               Text(
+//                 details!,
+//                 textAlign: TextAlign.center,
+//                 style: Theme.of(
+//                   context,
+//                 ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+//               ),
+//             ],
+//             const SizedBox(height: 16),
+//             OutlinedButton.icon(
+//               onPressed: onRetry,
+//               icon: const Icon(Icons.refresh),
+//               label: const Text('Reintentar'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

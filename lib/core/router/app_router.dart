@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/presentation/screens/dev/inputs.dart';
+import 'package:template_app/presentation/screens/objeto/create_objeto_screen.dart';
+import 'package:template_app/presentation/screens/objeto/editar_objeto_screen.dart';
+import 'package:template_app/presentation/screens/objeto/objeto_screen.dart';
 import 'package:template_app/presentation/screens/producto/create_producto_screen.dart';
 import 'package:template_app/presentation/screens/producto/editar_producto_screen.dart';
 import 'package:template_app/presentation/screens/producto/productos_screen.dart';
@@ -50,6 +53,23 @@ final appRouter = GoRouter(
           name: 'productoEdit',
           path: ':id/edit',
           builder: (c, s) => EditarProductoScreen(id: s.pathParameters['id']!),
+        ),
+      ],
+    ),
+    GoRoute(
+      name: 'objetos',
+      path: '/objetos',
+      builder: (_, __) => const ObjetoScreen(),
+      routes: [
+        GoRoute(
+          name: 'objetoNew',
+          path: 'new',
+          builder: (_, __) => const CrearObjetoScreen(),
+        ),
+        GoRoute(
+          name: 'objetoEdit',
+          path: ':id/edit',
+          builder: (c, s) => EditarObjetoScreen(id: s.pathParameters['id']!),
         ),
       ],
     ),

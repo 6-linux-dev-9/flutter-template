@@ -1,8 +1,6 @@
 import 'package:template_app/data/models/producto/input/producto_create_model.dart';
 import 'package:template_app/data/models/producto/input/producto_update_model.dart';
 import 'package:template_app/data/models/producto/output/producto_model.dart';
-
-import '../models/product_model.dart';
 import '../remote/api_client.dart';
 
 abstract class ProductRepository {
