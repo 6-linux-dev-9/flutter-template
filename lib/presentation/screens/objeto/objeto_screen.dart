@@ -134,11 +134,6 @@ class ObjetoScreen extends ConsumerWidget {
                         ),
 
                         const SizedBox(height: 10),
-
-                        // Campos principales
-                        FieldLine(label: 'ID', value: o.id.toString()),
-                        const SizedBox(height: 4),
-
                         if (o.nombre.isNotEmpty)
                           FieldLine(label: 'nombre', value: o.nombre),
                         const SizedBox(height: 4),
