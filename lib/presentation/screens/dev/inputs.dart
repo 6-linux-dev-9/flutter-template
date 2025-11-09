@@ -129,7 +129,7 @@ class _InputsCatalogScreenState extends State<InputsCatalogScreen> {
                 child: FormCard(
                   child: NumberInput(
                     controller: _numberCtrl,
-                    validator: _validateNumber,
+                    //validator: _validateNumber,
                   ),
                 ),
               ),
