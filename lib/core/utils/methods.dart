@@ -88,4 +88,9 @@ class ClassIdConverter {
     }
     return valor.toStringAsFixed(2);
   }
+
+  //para los nulos en caso de no enviar
+  static String? convertirParaModeloEnEdicionYCreacion(String str) {
+    return str.isEmpty ? null : str.trim();
+  }
 }
