@@ -76,7 +76,7 @@ class ClassIdConverter {
   }
 
   static String convertirParaStringEnScreen(String? str) {
-    if (str == null) {
+    if (str == null || str.isEmpty) {
       return 'N/A';
     }
     return str;
